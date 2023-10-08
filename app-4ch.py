@@ -75,6 +75,7 @@ def get_db():
         g.link_db = connect_bd()
     return g.link_db
 
+#======================== SOCKET ====================================== 
 def video_socket( tred ):
     new_post = data_base.getEndTred( tred )
     message = f"""
@@ -84,7 +85,7 @@ def video_socket( tred ):
             </div>
             <div class="post">
                 <div class="annon-info">
-                    <span class="post__id">{new_post[0][0]}</span> Тред:
+                    <span class="post__id">{new_post[0][0]}</span> Аноним:
                 </div>
                 <div class="post__content">
                     <video id="vid" onclick="videoOn('{new_post[0][0]}')" autoplay muted class="post_video" type="video/mp4" loop="1">
@@ -101,7 +102,6 @@ def video_socket( tred ):
         </div>
     """
     socketio.emit('message', message)
-
 def textmsg_socket( tred ):
     new_post = data_base.getEndTred( tred )
     message = f"""
@@ -111,7 +111,7 @@ def textmsg_socket( tred ):
             </div>
             <div class="post">
                 <div class="annon-info">
-                    <span class="post__id">{new_post[0][0]}</span> Тред:
+                    <span class="post__id">{new_post[0][0]}</span> Аноним:
                 </div>
                 <div class="post__content">
                     {new_post[0][1]}
@@ -120,7 +120,6 @@ def textmsg_socket( tred ):
         </div>
     """
     socketio.emit('message', message)
-
 def img_socket( tred ):
     new_post = data_base.getEndTred( tred )
     message = f"""
@@ -130,7 +129,7 @@ def img_socket( tred ):
             </div>
             <div class="post">
                 <div class="annon-info">
-                    <span class="post__id">{new_post[0][0]}</span> Тред:
+                    <span class="post__id">{new_post[0][0]}</span> Аноним:
                 </div>
                 <div class="post__content">
                     <a class="post-img-link" href="{ url_for('image_route', post_id=new_post[0][0], tred=tred) }" target="_blank">
@@ -142,6 +141,8 @@ def img_socket( tred ):
         </div>
     """
     socketio.emit('message', message)
+#======================== END SOCKET ====================================== 
+
 
 @app.teardown_appcontext
 def close_db(error):
