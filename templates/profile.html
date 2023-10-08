@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="pofile">
+    <div class="pofile__img-container">
+        <img class="pofile__img" src="{{ url_for('profileImage', loggin=title) }}" alt="ava">
+    </div>
+    <div class="pofile__info">
+        <h1 class="pofile__user-name">
+            Пользователь - {{ title }}
+        </h1>
+        <a class="logout" href="{{ link }}">выйти из аккаунта</a>
+    </div>
+</div>
+{% endblock %}
