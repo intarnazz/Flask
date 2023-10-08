@@ -75,6 +75,74 @@ def get_db():
         g.link_db = connect_bd()
     return g.link_db
 
+def video_socket( tred ):
+    new_post = data_base.getEndTred( tred )
+    message = f"""
+        <div class="out_post">
+            <div class="boc">
+                ...
+            </div>
+            <div class="post">
+                <div class="annon-info">
+                    <span class="post__id">{new_post[0][0]}</span> Тред:
+                </div>
+                <div class="post__content">
+                    <video id="vid" onclick="videoOn('{new_post[0][0]}')" autoplay muted class="post_video" type="video/mp4" loop="1">
+                        <source src="{ url_for('image_route', post_id=new_post[0][0], tred=tred) }" type="video/mp4" />
+                    </video>
+                    <div id="video_play_{new_post[0][0]}" class="video_play_block video_play_block_new draggable">
+                        <video id="video_{new_post[0][0]}" controls class="post_video video_play video_arr video_arr_new" type="video/mp4" loop="1">
+                            <source src="{ url_for('image_route', post_id=new_post[0][0], tred=tred) }" type="video/mp4" />
+                        </video>
+                    </div>
+                    {new_post[0][1]}
+                </div>
+            </div>
+        </div>
+    """
+    socketio.emit('message', message)
+
+def textmsg_socket( tred ):
+    new_post = data_base.getEndTred( tred )
+    message = f"""
+        <div class="out_post">
+            <div class="boc">
+                ...
+            </div>
+            <div class="post">
+                <div class="annon-info">
+                    <span class="post__id">{new_post[0][0]}</span> Тред:
+                </div>
+                <div class="post__content">
+                    {new_post[0][1]}
+                </div>
+            </div>
+        </div>
+    """
+    socketio.emit('message', message)
+
+def img_socket( tred ):
+    new_post = data_base.getEndTred( tred )
+    message = f"""
+        <div class="out_post">
+            <div class="boc">
+                ...
+            </div>
+            <div class="post">
+                <div class="annon-info">
+                    <span class="post__id">{new_post[0][0]}</span> Тред:
+                </div>
+                <div class="post__content">
+                    <a class="post-img-link" href="{ url_for('image_route', post_id=new_post[0][0], tred=tred) }" target="_blank">
+                        <img class="post_img" src="{ url_for('image_route', post_id=new_post[0][0], tred=tred) }" alt="Image">
+                    </a>
+                    {new_post[0][1]}
+                </div>
+            </div>
+        </div>
+    """
+    socketio.emit('message', message)
+
 @app.teardown_appcontext
 def close_db(error):
     """ соединение с бд """
@@ -138,6 +206,9 @@ def tread(): # оброботчик
                     img_binary,
                     'jpeg',
                     )
+                img_socket( 'posts' )
+
+
             elif filename[-4:] == '.mp4':
                 img_file = request.files['image']
                 img_binary = img_file.read()
@@ -147,6 +218,8 @@ def tread(): # оброботчик
                     img_binary,
                     'mp4',
                     )
+                video_socket( 'posts' )
+
             elif filename[-5:] == '.webm':
                 img_file = request.files['image']
                 img_binary = img_file.read()
@@ -156,26 +229,12 @@ def tread(): # оброботчик
                     img_binary,
                     'webm',
                     )
+                video_socket( 'posts' )
+                
         else:
             print("пост txt")
             resuld = data_base.addPost( 'posts', request.form['text-tread'] ) 
-            new_post = data_base.getEndTred( 'posts' )
-            message = f"""
-                <div class="out_post">
-                    <div class="boc">
-                        ...
-                    </div>
-                    <div class="post">
-                        <div class="annon-info">
-                            <span class="post__id">{new_post[0][0]}</span> Тред:
-                        </div>
-                        <div class="post__content">
-                            {new_post[0][1]}
-                        </div>
-                    </div>
-                </div>
-            """
-            socketio.emit('message', message)
+            textmsg_socket( 'posts' )
 
         return redirect( f'/4ch' )
     else:
@@ -233,8 +292,6 @@ def tred(tred_name): # оброботчик
             if filename[-4:] == '.jpg' or filename[-4:] == '.png':
                 img_file = request.files['image']
                 img_binary = img_file.read()
-                
-                
                 print("пост картинки")
                 resuld = data_base.addPostPost( 
                     tred_name,
@@ -242,11 +299,11 @@ def tred(tred_name): # оброботчик
                     img_binary,
                     'jpeg',
                     )
+                img_socket( tred_name )
+
             elif filename[-4:] == '.mp4':
                 img_file = request.files['image']
                 img_binary = img_file.read()
-                
-                
                 print("пост картинки")
                 resuld = data_base.addPostPost( 
                     tred_name,
@@ -254,11 +311,11 @@ def tred(tred_name): # оброботчик
                     img_binary,
                     'mp4',
                     )
+                video_socket( tred_name )
+
             elif filename[-5:] == '.webm':
                 img_file = request.files['image']
                 img_binary = img_file.read()
-                
-                
                 print("пост картинки")
                 resuld = data_base.addPostPost( 
                     tred_name,
@@ -266,17 +323,15 @@ def tred(tred_name): # оброботчик
                     img_binary,
                     'webm',
                     )
+                video_socket( tred_name )
+
         else:
             print("пост txt")
-            
-            
             resuld = data_base.addPost( tred_name, request.form['text-tread'] ) 
+            textmsg_socket( tred_name )
 
         return redirect( f'/4ch/{tred_name}' )
     else:
-        
-        
-
         tred_title = data_base.get_tred_name( f"/4ch/{tred_name}" )
         print(tred_title)
         tred_title = tred_title[0][0]

@@ -98,7 +98,7 @@ class FDataBase:
     
     def getEndTred(self, posts ):
         sql = f"""
-            SELECT post_id, post, img, tred_true, type
+            SELECT post_id, post, img, type
             FROM {posts}
             ORDER BY rowid DESC LIMIT 1;
             """

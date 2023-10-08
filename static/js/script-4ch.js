@@ -1,8 +1,11 @@
 'use strict';
 
-setTimeout(function() {
-    window.scrollTo(0, document.body.scrollHeight);
-}, 100);
+function scroll_down() {
+    setTimeout(function() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }, 300);
+}
+scroll_down()
 
 let videoActive = false
 let actualvideo_play
@@ -161,6 +164,40 @@ video_arr.forEach((video) => {
     });
 });
 
+let newVideoInit_i = 0
+function newVideoInit() {
+    let video_arr = document.querySelectorAll('.video_arr_new');
+    video_arr[newVideoInit_i].addEventListener('mouseup', function() {
+        setTimeout(function() {
+            video.play();
+        }, 1);        
+    });
+    let video_play_arr = document.querySelectorAll('.video_play_block_new')
+    video_play_arr[newVideoInit_i].addEventListener('wheel', (e) => {
+        e.preventDefault(); // Отменить стандартное поведение скроллинга
+        scaleSave = scale
+        let delta = Math.max(-1, Math.min(1, e.deltaY));
+        // Изменить масштаб в зависимости от направления скроллинга
+        if (delta < 0) {
+            scale += speed;
+        } else {
+            if (scale > 200) {
+                scale -= speed;
+
+            }
+        }
+        // Применить масштабирование к элементу
+        video_play.style.width = `${scale}px`;
+        video.style.width = `${scale}px`;
+        let deltall = scaleSave - scale
+        currentX = currentX + deltall/2
+        currentY = currentY + deltall/4
+        video_play.style.left = `${currentX}px`;
+        video_play.style.top = `${currentY}px`;
+    });
+    ++newVideoInit_i
+}
+
 
 let socket = io.connect('http://127.0.0.1:5000');
 
@@ -170,4 +207,6 @@ socket.on('message', function(message) {
     div.className = 'block__post'
     div.innerHTML = message;
     teredSection.appendChild(div);
+    scroll_down()
+    newVideoInit()
 });
