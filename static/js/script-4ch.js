@@ -7,6 +7,17 @@ function scroll_down() {
 }
 scroll_down()
 
+// window.addEventListener('load', function() {
+//     let scrollPosition = localStorage.getItem('scrollPosition');
+//     if (scrollPosition !== null) {
+//     window.scrollTo(0, parseInt(scrollPosition));
+//     }
+// });
+// window.addEventListener('scroll', function() {
+//     localStorage.setItem('scrollPosition', window.scrollY);
+// });
+
+
 let videoActive = false
 let actualvideo_play
 let video

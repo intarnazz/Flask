@@ -6,7 +6,6 @@ from flask import Flask, render_template, url_for, request, flash, session, redi
 from werkzeug.security import generate_password_hash, check_password_hash
 from FDataBase import FDataBase
 from flask_socketio import SocketIO
-from flask_login import LoginManager
 
 
 domen = 'http://127.0.0.1:5000/'
@@ -48,13 +47,12 @@ sk = '46205355d4292d929a7eb6313e47d468c3422df1'
 DATABASE = 'saper.db'
 DEBUG = True
 SECRET_KEY = f'{sk}'
+MAX_CONTENT_LENGTH = 1024 * 1024 * 1024
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update( dict( DATABASE = os.path.join( app.root_path, 'saper.db' ) ) )
 socketio = SocketIO(app)
-
-# login_manager = LoginManager(app)
 
 def connect_bd():
     conn = sq.connect( app.config['DATABASE'] )

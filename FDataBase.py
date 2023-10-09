@@ -50,7 +50,7 @@ class FDataBase:
     
     def getUsers(self):
         sql = """
-            SELECT loggin, password 
+            SELECT loggin, password, id_user 
             FROM users 
             ORDER BY id_user ASC
             """
@@ -141,6 +141,23 @@ class FDataBase:
         if row:
             return row
         return None
+    
+    def getUser(self, id_user):
+        try:
+            sql = f"""
+                SELECT *
+                FROM users
+                WHERE id_user = ?
+                """
+            self.__cur.execute(sql, (id_user,))
+            row = self.__cur.fetchone()
+            if not row:
+                print( 'user не найден' )
+                return False
+            return row
+        except sqlite3.Error as e:
+            print( "ошибка БД "+str(e) )
+        return False
 
     def addPost( self, tred_name, text_tread ):
         sql =f"""

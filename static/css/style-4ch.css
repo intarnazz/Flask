@@ -57,6 +57,8 @@ body {
 }
 .tered-section {
     font-family: trebuchet ms,sans-serif;
+    font-size: 15px;
+    font-weight: 500;
     margin-top: 10px;
     min-height: 100%;
     width: 100%;
