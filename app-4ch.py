@@ -17,6 +17,7 @@ from flask import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from FDataBase import FDataBase
 from flask_socketio import SocketIO
+from forms import *
 
 
 domen = "http://127.0.0.1:5000/"
@@ -179,27 +180,28 @@ def index():  # оброботчик
 
 @app.route("/login", methods=["POST", "GET"])
 def login():  # оброботчик
+    form = LoginForm()
     if request.cookies.get("logged"):
         log = request.cookies.get("logged")
         session["userLogged"] = log
     if "userLogged" in session:
         return redirect(url_for("profile", username=session["userLogged"]))
-    elif request.method == "POST":
+    elif form.validate_on_submit():  # эквивалент  if request.method == "POST":
         users = data_base.getUsers()
         for i in range(len(users)):
             print(users[i][0])
             print(users[i][1])
-            if (request.form["username"] == users[i][0]) and check_password_hash(
+            if (form.username.data == users[i][0]) and check_password_hash(
                 users[i][1], request.form["psw"]
             ):
-                session["userLogged"] = request.form["username"]
+                session["userLogged"] = form.username.data
                 res = make_response(
                     redirect(url_for("profile", username=session["userLogged"]))
                 )
-                res.set_cookie("logged", request.form["username"], 30 * 24 * 3600)
+                res.set_cookie("logged", form.username.data, 30 * 24 * 3600)
                 return res
 
-    return render_template("login.html", nav=nav, title="Login")
+    return render_template("login.html", nav=nav, title="Login", form=form)
 
 
 @app.route("/logout")
@@ -417,7 +419,7 @@ def profileLog():  # оброботчик
         session["userLogged"] = log
         return redirect(url_for("profile", username=log))
     else:
-        print("ошибка чтетия куки")
+        return render_template("page404.html", nav=nav), 404
 
 
 @app.route("/profile")
@@ -437,30 +439,31 @@ def profile(username):  # оброботчик
 @app.route("/register", methods=["POST", "GET"])
 def register():  # оброботчик
     users_reg = True
-    if request.method == "POST":
+    form = RegisterForm()
+    if form.validate_on_submit():
         users = data_base.getUsers()
         for i in range(len(users)):
-            if users[i][0] == request.form["username"]:
+            if users[i][0] == form.username.data:
                 flash("этот loggin уже зянят", category="error")
                 users_reg = False
                 print("Логин занят")
                 break
         if users_reg:
-            hash = generate_password_hash(request.form["password"])
+            hash = generate_password_hash(form.psw.data)
             if request.files["ava"]:
                 img_file = request.files["ava"]
                 img_binary = img_file.read()
-                data_base.addUser(request.form["username"], hash, img_binary)
+                data_base.addUser(form.username.data, hash, img_binary)
             else:
                 ava = None
-                data_base.addUser(request.form["username"], hash, ava)
-            session["userLogged"] = request.form["username"]
+                data_base.addUser(form.username.data, hash, ava)
+            session["userLogged"] = form.username.data
             res = make_response(
                 redirect(url_for("profile", username=session["userLogged"]))
             )
-            res.set_cookie("logged", request.form["username"], 30 * 24 * 3600)
+            res.set_cookie("logged", form.username.data, 30 * 24 * 3600)
             return res
-    return render_template("register.html", nav=nav, title="register")
+    return render_template("register.html", nav=nav, title="register", form=form)
 
 
 @app.route("/profileImage/<loggin>")
