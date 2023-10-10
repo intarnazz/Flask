@@ -1,0 +1,14 @@
+.body
+    @mixin box()
+        width: 80vh
+        margin: auto
+
+    display: flex
+    &__nav
+        @include box
+        &-tile
+            @include box
+            font-size: 50px
+    &__tile
+        font-size: 60px
+        

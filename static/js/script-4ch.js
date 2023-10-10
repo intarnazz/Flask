@@ -1,7 +1,7 @@
 'use strict';
 
 function scroll_down() {
-    setTimeout(function() {
+    setTimeout(function () {
         window.scrollTo(0, document.body.scrollHeight);
     }, 300);
 }
@@ -35,7 +35,7 @@ let video_play_value_save
 
 let video_play_content
 function videoOn(post_id) {
-    if ( video_play != undefined ) {
+    if (video_play != undefined) {
         video_play.style.display = 'none'
         video.pause();
     }
@@ -55,12 +55,12 @@ function videoOn(post_id) {
 
     video_play.style.zIndex = '3'
 
-    if ( video_play != undefined ) {
+    if (video_play != undefined) {
         video_play.style.left = currentX + 'px';
         video_play.style.top = currentY + 'px';
     }
 
-    
+
     // addEventListener addEventListener addEventListener
     video_play.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -71,14 +71,14 @@ function videoOn(post_id) {
     document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         e.preventDefault();
-        
+
         currentX = e.clientX - initialX;
         currentY = e.clientY - initialY;
-        
+
         video_play.style.left = currentX + 'px';
         video_play.style.top = currentY + 'px';
     });
-    
+
     document.addEventListener('mouseup', () => {
         isDragging = false;
         video_play.classList.remove('dragging');
@@ -89,21 +89,21 @@ function videoOn(post_id) {
 
     let screenWidth = window.innerWidth;
     let rect = video_play.getBoundingClientRect();
-    console.log( rect.top, rect.left )
-    if ( vidio_init 
-        || video_play.offsetTop < 0 
-        || video_play.offsetLeft < 0  
+    console.log(rect.top, rect.left)
+    if (vidio_init
+        || video_play.offsetTop < 0
+        || video_play.offsetLeft < 0
         || video_play.offsetLeft > screenWidth - 10
         || video_play.offsetTop > screenWidth - 10
-        ) {    
-            initialX = video_play.getBoundingClientRect().left;
-            initialY = video_play.getBoundingClientRect().top;
-            console.log( parseFloat(video_play.style.height) )
-            currentX = window.innerWidth/2 - parseFloat(video_play.style.width)/2;
-            currentY = window.innerHeight/8;
-            video_play.style.left = currentX + 'px';
-            video_play.style.top = currentY + 'px';
-            vidio_init = false
+    ) {
+        initialX = video_play.getBoundingClientRect().left;
+        initialY = video_play.getBoundingClientRect().top;
+        console.log(parseFloat(video_play.style.height))
+        currentX = window.innerWidth / 2 - parseFloat(video_play.style.width) / 2;
+        currentY = window.innerHeight / 8;
+        video_play.style.left = currentX + 'px';
+        video_play.style.top = currentY + 'px';
+        vidio_init = false
     }
 
     videoActive = true
@@ -119,11 +119,11 @@ function videoOn(post_id) {
 
 let closestPopup
 let closestButton
-document.addEventListener( 'click', function(event) {
-    if ( videoActive === true ) {
-        closestPopup = event.target.closest( `#${actualvideo_play}` );
-        closestButton = event.target.closest( '#vid' );
-        if ( closestPopup === null && closestButton === null ) {
+document.addEventListener('click', function (event) {
+    if (videoActive === true) {
+        closestPopup = event.target.closest(`#${actualvideo_play}`);
+        closestButton = event.target.closest('#vid');
+        if (closestPopup === null && closestButton === null) {
             video.pause();
             video_play.style.display = 'none';
             videoActive = false;
@@ -135,7 +135,7 @@ document.addEventListener( 'click', function(event) {
 let isDragging = false;
 let initialX, initialY, currentX, currentY;
 
-if ( video_play != undefined ) {
+if (video_play != undefined) {
     video_play.style.left = '35%';
     video_play.style.top = '35%';
 }
@@ -158,8 +158,8 @@ video_play_arr.forEach((video_play) => {
         video_play.style.width = `${scale}px`;
         video.style.width = `${scale}px`;
         let deltall = scaleSave - scale
-        currentX = currentX + deltall/2
-        currentY = currentY + deltall/4
+        currentX = currentX + deltall / 2
+        currentY = currentY + deltall / 4
         video_play.style.left = `${currentX}px`;
         video_play.style.top = `${currentY}px`;
     });
@@ -168,20 +168,20 @@ video_play_arr.forEach((video_play) => {
 let video_arr = document.querySelectorAll('.video_arr');
 
 video_arr.forEach((video) => {
-    video.addEventListener('mouseup', function() {
-        setTimeout(function() {
+    video.addEventListener('mouseup', function () {
+        setTimeout(function () {
             video.play();
-        }, 1);        
+        }, 1);
     });
 });
 
 let newVideoInit_i = 0
 function newVideoInit() {
     let video_arr = document.querySelectorAll('.video_arr_new');
-    video_arr[newVideoInit_i].addEventListener('mouseup', function() {
-        setTimeout(function() {
+    video_arr[newVideoInit_i].addEventListener('mouseup', function () {
+        setTimeout(function () {
             video.play();
-        }, 1);        
+        }, 1);
     });
     let video_play_arr = document.querySelectorAll('.video_play_block_new')
     video_play_arr[newVideoInit_i].addEventListener('wheel', (e) => {
@@ -201,8 +201,8 @@ function newVideoInit() {
         video_play.style.width = `${scale}px`;
         video.style.width = `${scale}px`;
         let deltall = scaleSave - scale
-        currentX = currentX + deltall/2
-        currentY = currentY + deltall/4
+        currentX = currentX + deltall / 2
+        currentY = currentY + deltall / 4
         video_play.style.left = `${currentX}px`;
         video_play.style.top = `${currentY}px`;
     });
@@ -212,7 +212,7 @@ function newVideoInit() {
 
 let socket = io.connect('http://127.0.0.1:5000');
 
-socket.on('message', function(message) {
+socket.on('message', function (message) {
     let teredSection = document.getElementById('tered-section');
     let div = document.createElement('div');
     div.className = 'block__post'

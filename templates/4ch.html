@@ -1,115 +1,122 @@
 {% extends 'base.html' %}
-    {% block link -%}
-        {{ super() }}
-        <link rel="stylesheet" href="
+{% block link -%}
+{{ super() }}
+<link rel="stylesheet" href="
             {{ url_for( 'static', filename='css/reset.css' ) }}
         ">
-        <link rel="stylesheet" href="
+<link rel="stylesheet" href="
             {{ url_for( 'static', filename='css/style-4ch.css' ) }}
         ">
-    {% endblock link -%}
-    {%- block nav -%}
-        {{ super() }}
-        <div id="header"  class="header">
-                <div class="logo">
-                    <img src="{{ url_for( 'static', filename='img/ch-monika.png' ) }}" class="logo__img" alt="monika">
-                    <h1 class="logo__title">
-                        4-ch
-                    </h1>
-                </div>
-                <div class="create_tred">
-                    <div class="posting-form__text">
-                        Форма создания треда
-                    </div>
-                    <form action="/tredcreate" method="POST">
-                        <p><label>Укажите тему доски:</label></p>
-                        <p><input type="text" name="tred_name"></p>
-                        <p><input type="submit" class="form-batton" value="Создать доску"></p>
-                    </form>
-                </div>
-                <div class="posting-form">
-                    <div class="posting-form__text">
-                        Форма постинга
-                    </div>
-                    <form action="/4ch" method="POST" class="form-posting" enctype="multipart/form-data">
-                        <p><textarea name="text-tread" cols="57" rows="6" autofocus></textarea></p>
-                        <p><input type="submit" class="form-batton" value="Отправить"></p>
-                        <p><input class="form-batton" type="file" name="image" id="image"></p>
-                    </form>  
-                </div>
-                <img class="header__gif" src="{{ url_for( 'static', filename='img/gif/' + gif + '.gif' ) }}" alt="gif">
+{% endblock link -%}
+{%- block nav -%}
+{{ super() }}
+<div id="header" class="header">
+    <div class="logo">
+        <img src="{{ url_for( 'static', filename='img/ch-monika.png' ) }}" class="logo__img" alt="monika">
+        <h1 class="logo__title">
+            4-ch
+        </h1>
+    </div>
+    <div class="create_tred">
+        <div class="posting-form__text">
+            Форма создания треда
         </div>
-    {%- endblock nav -%}
-    {%- block content -%}
-        <div class="main">
-            <div class="left-menu">
-                опциональная информация для анонов: <br><br>
-                Подрерживаем форматы:
-                <ul class="left-menu__ul">
-                    <li>.png</li>
-                    <li>.jfif</li>
-                    <li>.jpg</li>
-                    <li>.mp4</li>
-                    <li>.webm</li>
-                </ul>
+        <form action="/tredcreate" method="POST">
+            <p><label>Укажите тему доски:</label></p>
+            <p><input type="text" name="tred_name"></p>
+            <p><input type="submit" class="form-batton" value="Создать доску"></p>
+        </form>
+    </div>
+    <div class="posting-form">
+        <div class="posting-form__text">
+            Форма постинга
+        </div>
+        <form action="/4ch" method="POST" class="form-posting" enctype="multipart/form-data">
+            <p><textarea name="text-tread" cols="57" rows="6" autofocus></textarea></p>
+            <p><input type="submit" class="form-batton" value="Отправить"></p>
+            <p><input class="form-batton" type="file" name="image" id="image"></p>
+        </form>
+    </div>
+    <img class="header__gif" src="{{ url_for( 'static', filename='img/gif/' + gif + '.gif' ) }}" alt="gif">
+</div>
+{%- endblock nav -%}
+{%- block content -%}
+<div class="main">
+    <div class="left-menu">
+        опциональная информация для анонов: <br><br>
+        Подрерживаем форматы:
+        <ul class="left-menu__ul">
+            <li>.png</li>
+            <li>.jfif</li>
+            <li>.jpg</li>
+            <li>.mp4</li>
+            <li>.webm</li>
+        </ul>
+    </div>
+    <div id="tered-section" class="tered-section">
+        {% for i in tred %}
+        <div class="block__post">
+            <div class="out_post">
+                <div class="boc">
+                    ...
+                </div>
+                <div class="post">
+                    {% if i[3] != None %}
+                    <div class="annon-info">
+                        <span class="post__id">{{ i[0] }}</span> Тред:
+                    </div>
+                    <div class="post__content">
+                        {% if i[2] != None %}
+                        <!-- ссылка на тред -->
+                        <a class="post-img-link" href="{{ url_for('image_route', post_id=i[0], tred='posts') }}"
+                            target="_blank">
+                            <img class="post_img" src="{{ url_for('image_route', post_id=i[0], tred='posts') }}"
+                                alt="Image">
+                        </a>
+                        {% endif %}
+                        <a href="{{ i[3] }}">{{ i[1] }}</a>
+                    </div>
+                    {% else %}
+                    <!-- пост -->
+                    <div class="annon-info">
+                        <span class="post__id">{{ i[0] }}</span> Аноним:
+                    </div>
+                    <div class="post__content">
+                        {% if i[2] != None and i[4] == 'jpeg' %}
+                        <a class="post-img-link" href="{{ url_for('image_route', post_id=i[0], tred='posts') }}"
+                            target="_blank">
+                            <img class="post_img" src="{{ url_for('image_route', post_id=i[0], tred='posts') }}"
+                                alt="Image">
+                        </a>
+                        {% elif i[2] != None and (i[4] == 'mp4' or i[4] == 'webm' ) %}
+                        <video id="vid" onclick="videoOn('{{i[0]}}')" autoplay muted class="post_video" type="video/mp4"
+                            loop="1">
+                            <source src="{{ url_for('image_route', post_id=i[0], tred='posts') }}" type="video/mp4" />
+                        </video>
+                        <div id="video_play_{{ i[0] }}" class="video_play_block draggable">
+                            <video id="video_{{ i[0] }}" controls class="post_video video_play video_arr"
+                                type="video/mp4" loop="1">
+                                <source src="{{ url_for('image_route', post_id=i[0], tred='posts') }}"
+                                    type="video/mp4" />
+                            </video>
+                        </div>
+                        <!-- muted autoplay controls -->
+                        {% endif %}
+                        {{ i[1] }}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div id="tered-section" class="tered-section">
-                {% for i in tred %}
-                <div class="block__post">
-                    <div class="out_post">
-                        <div class="boc">
-                            ...
-                        </div>
-                        <div class="post">
-                            {% if i[3] != None %}
-                                <div class="annon-info">
-                                    <span class="post__id">{{ i[0] }}</span> Тред:
-                                </div>
-                                <div class="post__content">
-                                    {% if i[2] != None %}
-                                    <!-- ссылка на тред -->
-                                    <a class="post-img-link" href="{{ url_for('image_route', post_id=i[0], tred='posts') }}" target="_blank">
-                                        <img class="post_img" src="{{ url_for('image_route', post_id=i[0], tred='posts') }}" alt="Image">
-                                    </a>
-                                    {% endif %}
-                                    <a href="{{ i[3] }}">{{ i[1] }}</a>
-                                </div>
-                            {% else %}
-                            <!-- пост -->
-                                <div class="annon-info">
-                                    <span class="post__id">{{ i[0] }}</span> Аноним:
-                                </div>
-                                <div class="post__content">
-                                    {% if i[2] != None and i[4] == 'jpeg' %}
-                                    <a class="post-img-link" href="{{ url_for('image_route', post_id=i[0], tred='posts') }}" target="_blank">
-                                        <img class="post_img" src="{{ url_for('image_route', post_id=i[0], tred='posts') }}" alt="Image">
-                                    </a>
-                                    {% elif i[2] != None and (i[4] == 'mp4' or i[4] == 'webm' ) %}
-                                        <video id="vid" onclick="videoOn('{{i[0]}}')" autoplay muted class="post_video" type="video/mp4" loop="1">
-                                            <source src="{{ url_for('image_route', post_id=i[0], tred='posts') }}" type="video/mp4" />
-                                        </video>
-                                        <div id="video_play_{{ i[0] }}" class="video_play_block draggable">
-                                            <video id="video_{{ i[0] }}" controls class="post_video video_play video_arr" type="video/mp4" loop="1">
-                                                <source src="{{ url_for('image_route', post_id=i[0], tred='posts') }}" type="video/mp4" />
-                                            </video>
-                                        </div>
-                                        <!-- muted autoplay controls -->
-                                    {% endif %}
-                                    {{ i[1] }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            <!-- сокет -->
         </div>
+        {% endfor %}
+        <!-- сокет -->
+    </div>
     {%- endblock content -%}
-    {% block script  %}
-        {{ super() }}
-        <script src="{{ url_for( 'static', filename='js/socket.js' ) }}">
-        </script>
-        <script src="
+    {% block script %}
+    {{ super() }}
+    <script src="{{ url_for( 'static', filename='js/socket.js' ) }}">
+    </script>
+    <script src="
             {{ url_for( 'static', filename='js/script-4ch.js' ) }}
         "></script>
     {% endblock script %}
