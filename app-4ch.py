@@ -267,6 +267,7 @@ def tread():  # оброботчик
             title="4ch",
             tred=data_base.getTred("posts"),
             gif=gif,
+            tred_name = 'posts'
         )
 
 

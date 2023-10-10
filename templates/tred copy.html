@@ -17,25 +17,16 @@
             4-ch
         </h1>
     </div>
-    {% block tredcreate %}
     <div class="create_tred">
         <div class="posting-form__text">
-            Форма создания треда
+            {{ title }}
         </div>
-        <form action="/tredcreate" method="POST">
-            <p><label>Укажите тему доски:</label></p>
-            <p><input type="text" name="tred_name"></p>
-            <p><input type="submit" class="form-batton" value="Создать доску"></p>
-        </form>
     </div>
-    {% endblock tredcreate %}
     <div class="posting-form">
         <div class="posting-form__text">
             Форма постинга
         </div>
-        {% block form_action %}
-        <form action="/4ch" method="POST" class="form-posting" enctype="multipart/form-data">
-        {% endblock form_action %}
+        <form action="/4ch/{{ tred_name }}" method="POST" class="form-posting" enctype="multipart/form-data">
             <p><textarea name="text-tread" cols="57" rows="6" autofocus></textarea></p>
             <p><input type="submit" class="form-batton" value="Отправить"></p>
             <p><input class="form-batton" type="file" name="image" id="image"></p>
@@ -65,34 +56,18 @@
                     ...
                 </div>
                 <div class="post">
-                    {% if i[3] != None and title == '4ch' %}
-                    <div class="annon-info">
-                        <span class="post__id">{{ i[0] }}</span> Тред:
-                    </div>
-                    <div class="post__content">
-                        {% if i[2] != None %}
-                        <!-- ссылка на тред -->
-                        <a class="post-img-link" href="{{ url_for('image_route', post_id=i[0], tred=tred_name) }}"
-                            target="_blank">
-                            <img class="post_img" src="{{ url_for('image_route', post_id=i[0], tred=tred_name) }}"
-                                alt="Image">
-                        </a>
-                        {% endif %}
-                        <a href="{{ i[3] }}">{{ i[1] }}</a>
-                    </div>
-                    {% else %}
                     <!-- пост -->
                     <div class="annon-info">
                         <span class="post__id">{{ i[0] }}</span> Аноним:
                     </div>
                     <div class="post__content">
-                        {% if i[2] != None and (i[4] == 'jpeg' or i[3] == 'jpeg')  %}
+                        {% if i[2] != None and i[3] == 'jpeg' %}
                         <a class="post-img-link" href="{{ url_for('image_route', post_id=i[0], tred=tred_name) }}"
                             target="_blank">
                             <img class="post_img" src="{{ url_for('image_route', post_id=i[0], tred=tred_name) }}"
                                 alt="Image">
                         </a>
-                        {% elif i[2] != None and ((i[4] == 'mp4' or i[3] == 'mp4') or (i[4] == 'webm' or i[3] == 'webm') ) %}
+                        {% elif i[2] != None and (i[3] == 'mp4' or i[3] == 'webm' ) %}
                         <video id="vid" onclick="videoOn('{{i[0]}}')" autoplay muted class="post_video" type="video/mp4"
                             loop="1">
                             <source src="{{ url_for('image_route', post_id=i[0], tred=tred_name) }}" type="video/mp4" />
@@ -108,19 +83,17 @@
                         {% endif %}
                         {{ i[1] }}
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
         {% endfor %}
-        <!-- сокет -->
     </div>
-    {%- endblock content -%}
-    {% block script %}
-    {{ super() }}
-    <script src="{{ url_for( 'static', filename='js/socket.js' ) }}">
-    </script>
-    <script src="
-            {{ url_for( 'static', filename='js/script-4ch.js' ) }}
+</div>
+{%- endblock content -%}
+{% block script %}
+<script src="{{ url_for( 'static', filename='js/socket.js' ) }}">
+</script>
+<script src="
+        {{ url_for( 'static', filename='js/script-4ch.js' ) }}
         "></script>
-    {% endblock script %}
+{% endblock script %}
