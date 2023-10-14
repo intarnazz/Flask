@@ -27,20 +27,19 @@ let initialYSave
 let currentXSave
 let currentYSave
 let vidio_init = true
-let scale = 500; // Начальный масштаб
+let scale = window.innerWidth / 2; // Начальный масштаб
 let speed = 70
 let video_play_arr = document.querySelectorAll('.video_play_block')
 let video_play_value_save
+let video_width_default = true
 
 
 let video_play_content
-function videoOn(post_id) {
+function videoOn(post_id) { // video click
     if (video_play != undefined) {
         video_play.style.display = 'none'
         video.pause();
     }
-    speed = speed
-
 
     actualvideo_play = `video_play_${post_id}`
     video_play = document.getElementById(`video_play_${post_id}`)
@@ -99,6 +98,9 @@ function videoOn(post_id) {
         initialX = video_play.getBoundingClientRect().left;
         initialY = video_play.getBoundingClientRect().top;
         console.log(parseFloat(video_play.style.height))
+        video_play.style.width = `${window.innerWidth / 2}px`
+        video.style.width = `${window.innerWidth / 2 }px`
+        scale = window.innerWidth / 2
         currentX = window.innerWidth / 2 - parseFloat(video_play.style.width) / 2;
         currentY = window.innerHeight / 8;
         video_play.style.left = currentX + 'px';
@@ -135,10 +137,6 @@ document.addEventListener('click', function (event) {
 let isDragging = false;
 let initialX, initialY, currentX, currentY;
 
-if (video_play != undefined) {
-    video_play.style.left = '35%';
-    video_play.style.top = '35%';
-}
 let scaleSave = scale
 video_play_arr.forEach((video_play) => {
     video_play.addEventListener('wheel', (e) => {

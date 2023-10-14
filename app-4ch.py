@@ -18,6 +18,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from FDataBase import FDataBase
 from flask_socketio import SocketIO
 from forms import *
+from admin.admin import Admin
 
 
 domen = "http://127.0.0.1:5000/"
@@ -65,6 +66,11 @@ MAX_CONTENT_LENGTH = 1024 * 1024 * 1024
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, "saper.db")))
+
+admin = Admin( nav )
+
+app.register_blueprint( admin.admin, url_prefix='/admin' )
+
 socketio = SocketIO(app)
 
 
@@ -187,6 +193,9 @@ def login():  # оброботчик
     if "userLogged" in session:
         return redirect(url_for("profile", username=session["userLogged"]))
     elif form.validate_on_submit():  # эквивалент  if request.method == "POST":
+        if form.username.data == "admin" and form.psw.data == "admin" and 1==1:
+            session["admin"] = True
+            return redirect( url_for("admin.index") )
         users = data_base.getUsers()
         for i in range(len(users)):
             print(users[i][0])
@@ -267,7 +276,7 @@ def tread():  # оброботчик
             title="4ch",
             tred=data_base.getTred("posts"),
             gif=gif,
-            tred_name = 'posts'
+            tred_name="posts",
         )
 
 
