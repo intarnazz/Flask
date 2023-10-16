@@ -206,16 +206,3 @@ function newVideoInit() {
     });
     ++newVideoInit_i
 }
-
-
-let socket = io.connect('http://127.0.0.1:5000');
-
-socket.on('message', function (message) {
-    let teredSection = document.getElementById('tered-section');
-    let div = document.createElement('div');
-    div.className = 'block__post'
-    div.innerHTML = message;
-    teredSection.appendChild(div);
-    scroll_down()
-    newVideoInit()
-});

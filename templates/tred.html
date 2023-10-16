@@ -11,3 +11,18 @@
 {% block form_action %}
 <form action="/4ch/{{ tred_name }}" method="POST" class="form-posting" enctype="multipart/form-data">
 {% endblock form_action %}
+{% block script_socket %}
+<script>
+    'use strict';
+    let socket = io.connect('http://127.0.0.1:5000');
+    socket.on( '{{ tred_name }}' , function (message) {
+    let teredSection = document.getElementById('tered-section');
+    let div = document.createElement('div');
+    div.className = 'block__post';
+    div.innerHTML = message;
+    teredSection.appendChild(div);
+    scroll_down();
+    newVideoInit();
+    });
+</script>
+{% endblock script_socket %}
