@@ -1,6 +1,8 @@
+* {
+    box-sizing: border-box;
+}
 body {
     width: 100%;
-    min-width: 650px;
     min-height: 100lvh;
     background-color: #eeeeee;
     font-family: 'Franklin Gothic Medium', 
@@ -53,7 +55,6 @@ body {
 
 .main {
     display: flex;
-    min-height: 70vh;
 }
 .tered-section {
     font-family: trebuchet ms,sans-serif;
@@ -209,4 +210,43 @@ header {
 }
 .header__gif {
     height: 170px;
+}
+
+@media screen and ( max-width: 768px ) {
+
+    .left-menu,
+    .boc,
+    .header__gif,
+    .logo,
+    .create_tred {
+        display: none;
+    }
+    .nav {
+        flex-wrap: wrap;
+        width: 100vw;
+    }
+    .header {
+        width: 100vw;
+        justify-content: center;
+        padding: 5px
+    }
+    .posting-form,
+    .textarea {
+        width: 90vw;
+    }
+    .tered-section {
+        width: 100vw;
+    }
+    .post__content {
+        flex-direction: column;
+    }
+    main {
+        margin: 0;
+        width: 100vw;
+    }
+    header,
+    body {
+        width: 100vw;
+        max-width: 100vw;
+    }
 }

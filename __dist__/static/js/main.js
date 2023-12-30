@@ -1,0 +1,1 @@
+"use strict"; document.cookie = "ex=1", document.cookie || alert("Этот сайт ребует включиных cookies для корректной работы");

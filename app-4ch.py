@@ -1,4 +1,3 @@
-import sqlite3 as sq
 import os
 import io
 from random import choice
@@ -13,16 +12,17 @@ from flask import (
     g,
     send_file,
     make_response,
+    jsonify,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from FDataBase import FDataBase
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send
 from forms import *
 from admin.admin import Admin
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 
-domen = "http://127.0.0.1:5000/"
+domen = "http://127.0.0.1:5000"
 
 nav = [
     domen,
@@ -69,12 +69,13 @@ app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, "saper.db")))
 db_path = os.path.join(app.root_path, "saper.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+CORS(app)
 
 admin = Admin(nav)
 
 app.register_blueprint(admin.admin, url_prefix="/admin")
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 db = SQLAlchemy(app)
 
@@ -100,6 +101,15 @@ class Posts(db.Model):
     tred_true = db.Column(db.String(255))
     type = db.Column(db.String(255))
     tred_name = db.Column(db.String(255), nullable=True)
+    like = db.Column(db.Integer)
+    dislike = db.Column(db.Integer)
+
+
+class Comments(db.Model):
+    comment_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=True)
+    post_id = db.Column(db.Integer, nullable=True)
+    comment_text = db.Column(db.String(255), nullable=True)
+    user_id = db.Column(db.Integer, nullable=True)
 
 
 # def connect_db():
@@ -229,6 +239,7 @@ def login():  # оброботчик
             return redirect(url_for("admin.index"))
         users = Users.query.all()
         for i in range(len(users)):
+            print(users)
             print(users[i].loggin)
             print(users[i].password)
             if (form.username.data == users[i].loggin) and check_password_hash(
@@ -240,6 +251,15 @@ def login():  # оброботчик
                 )
                 res.set_cookie("logged", form.username.data, 30 * 24 * 3600)
                 return res
+    elif request.method == "POST":  # api
+        data = request.get_json()
+        users = Users.query.all()
+        for i in range(len(users)):
+            if (data["login"] == users[i].loggin) and check_password_hash(
+                users[i].password, data["password"]
+            ):
+                return jsonify({"code": 200})
+        return jsonify({"code": 500})
 
     return render_template("login.html", nav=nav, title="Login", form=form)
 
@@ -252,6 +272,98 @@ def logout():  # оброботчик
     res = make_response(redirect(f"/profile/"))
     res.set_cookie("logged", "", 0)
     return res
+
+
+@app.route("/api", methods=["POST", "GET"])
+def api():  # оброботчик
+    """api"""
+    arr = Posts.query.filter(Posts.tred_name == "video_api").all()
+    res = {}
+    for i in arr:
+        res[i.post_id] = {
+            "name": i.post,
+        }
+    return jsonify({"data": res})
+
+
+@app.route("/api/Comment", methods=["POST", "GET"])
+def apiComments():  # оброботчик
+    """api"""
+    if request.method == "POST":
+        data = request.get_json()
+        users = Users.query.all()
+        for i in range(len(users)):
+            if (data["login"] == users[i].loggin) and check_password_hash(
+                users[i].password, data["password"]
+            ):
+                try:
+                    addData = Comments(
+                        post_id=data["post_id"],
+                        comment_text=data["comment_text"],
+                        user_id=Users.query.filter(Users.loggin == data["login"])
+                        .all()[0]
+                        .id_user,
+                    )
+                    db.session.add(addData)
+                    db.session.flush()
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    print("ошибка чтения бд")
+                    return jsonify({"code": 500})
+                return jsonify({"code": 200})
+
+    return jsonify({"code": 500})
+
+
+@app.route("/api/GetComment/<int:post_id>", methods=["POST", "GET"])
+def apiGetComments(post_id):  # оброботчик
+    """api"""
+    comments = Comments.query.filter(Comments.post_id == post_id).all()
+    res = {}
+    for i in range(len(comments)):
+        res[i] = {
+            "text": comments[i].comment_text,
+            "user": Users.query.filter(Users.id_user == comments[i].user_id)
+            .all()[0]
+            .loggin,
+        }
+    return jsonify(res)
+
+
+@app.route("/api/<int:id>", methods=["POST", "GET"])
+def apiGetID(id):  # оброботчик
+    """api"""
+    arr = Posts.query.filter(Posts.post_id == id).all()
+    res = {}
+    res[arr[0].post_id] = {
+        "name": arr[0].post,
+        "like": arr[0].like,
+        "dislike": arr[0].dislike,
+    }
+    return jsonify({"data": res})
+
+
+@app.route("/api/like/<int:id>", methods=["POST", "GET"])
+def like(id):  # оброботчик
+    """api"""
+    delta = int(request.args.get("delta"))
+    event = request.args.get("event")
+    posts_item = Posts.query.get(id)
+    if event == "like":
+        if posts_item.like == None:
+            posts_item.like = 0 + delta
+        else:
+            posts_item.like = int(posts_item.like) + delta
+        db.session.commit()
+        return jsonify({"like": posts_item.like})
+    elif event == "dislike":
+        if posts_item.dislike == None:
+            posts_item.dislike = 0 + delta
+        else:
+            posts_item.dislike = int(posts_item.dislike) + delta
+        db.session.commit()
+        return jsonify({"like": posts_item.dislike})
 
 
 @app.route("/4ch", methods=["POST", "GET"])

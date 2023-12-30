@@ -1,0 +1,11 @@
+{% extends '4ch.html' %} {% block tredcreate %}<div class="create_tred"><div class="posting-form__text">{{ title }}</div></div>{% endblock tredcreate %} {% block form_action %}<form action="/4ch/{{ tred_name }}" method="POST" class="form-posting" enctype="multipart/form-data">{% endblock form_action %} {% block script_socket %}<script>'use strict';
+    let socket = io.connect('{{ nav[0] }}');
+    socket.on( '{{ tred_name }}' , function (message) {
+    let teredSection = document.getElementById('tered-section');
+    let div = document.createElement('div');
+    div.className = 'block__post';
+    div.innerHTML = message;
+    teredSection.appendChild(div);
+    scroll_down();
+    newVideoInit();
+    });</script>{% endblock script_socket %}</form>

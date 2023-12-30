@@ -95,17 +95,32 @@ function videoOn(post_id) { // video click
         || video_play.offsetLeft > screenWidth - 10
         || video_play.offsetTop > screenWidth - 10
     ) {
-        initialX = video_play.getBoundingClientRect().left;
-        initialY = video_play.getBoundingClientRect().top;
-        console.log(parseFloat(video_play.style.height))
-        video_play.style.width = `${window.innerWidth / 2}px`
-        video.style.width = `${window.innerWidth / 2 }px`
-        scale = window.innerWidth / 2
-        currentX = window.innerWidth / 2 - parseFloat(video_play.style.width) / 2;
-        currentY = window.innerHeight / 8;
-        video_play.style.left = currentX + 'px';
-        video_play.style.top = currentY + 'px';
-        vidio_init = false
+        if ( window.innerWidth < 768 ) {
+            initialX = video_play.getBoundingClientRect().left;
+            initialY = video_play.getBoundingClientRect().top;
+            console.log(parseFloat(video_play.style.height))
+            video_play.style.width = `${window.innerWidth}px`
+            video.style.width = `${window.innerWidth}px`
+            scale = window.innerWidth
+            currentX = 0;
+            currentY = 0;
+            video_play.style.left = currentX + 'px';
+            video_play.style.top = currentY + 'px';
+            vidio_init = false
+        } else {
+            let video_width_kof = 3
+            initialX = video_play.getBoundingClientRect().left;
+            initialY = video_play.getBoundingClientRect().top;
+            console.log(parseFloat(video_play.style.height))
+            video_play.style.width = `${window.innerWidth / video_width_kof}px`
+            video.style.width = `${window.innerWidth / video_width_kof}px`
+            scale = window.innerWidth / video_width_kof
+            currentX = window.innerWidth / 2 - parseFloat(video_play.style.width) / 2;
+            currentY = window.innerHeight / 8;
+            video_play.style.left = currentX + 'px';
+            video_play.style.top = currentY + 'px';
+            vidio_init = false
+        }
     }
 
     videoActive = true

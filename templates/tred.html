@@ -14,7 +14,7 @@
 {% block script_socket %}
 <script>
     'use strict';
-    let socket = io.connect('http://127.0.0.1:5000');
+    let socket = io.connect('{{ nav[0] }}');
     socket.on( '{{ tred_name }}' , function (message) {
     let teredSection = document.getElementById('tered-section');
     let div = document.createElement('div');

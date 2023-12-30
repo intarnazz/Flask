@@ -36,7 +36,7 @@
         {% block form_action %}
         <form action="/4ch" method="POST" class="form-posting" enctype="multipart/form-data">
             {% endblock form_action %}
-            <p><textarea name="text-tread" cols="57" rows="6" autofocus></textarea></p>
+            <p><textarea class="textarea" name="text-tread" cols="57" rows="6" autofocus></textarea></p>
             <p><input type="submit" class="form-batton" value="Отправить"></p>
             <p><input class="form-batton" type="file" name="image" id="image"></p>
         </form>
@@ -128,7 +128,7 @@
     {% block script_socket %}
     <script>
         'use strict';
-        let socket = io.connect('http://127.0.0.1:5000');
+        let socket = io.connect('{{ nav[0] }}/4ch');
         socket.on('posts', function (message) {
         let teredSection = document.getElementById('tered-section');
         let div = document.createElement('div');
