@@ -113,6 +113,13 @@ class Comments(db.Model):
     user_id = db.Column(db.Integer, nullable=True)
 
 
+class Flover(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True, nullable=True)
+    name = db.Column(db.Integer, nullable=True)
+    img = db.Column(db.LargeBinary, nullable=True)
+    price = db.Column(db.Integer, nullable=True)
+
+
 # def connect_db():
 #     conn = sq.connect(app.config["DATABASE"])
 #     # conn.row_factory = sq.Row
@@ -751,6 +758,25 @@ def profileHeader(loggin):  # оброботчик
         return send_file("./static/img/userHeaderDef.jpg", mimetype="image/jpeg")
     else:
         return send_file(io.BytesIO(user[0].header), mimetype="image/jpeg")
+
+
+@app.route("/floverImg/<int:id>")
+def floverImg(id):  # оброботчик
+    """фото цветочка"""
+    flover = Flover.query.filter(Flover.id == id).first()
+    return send_file(io.BytesIO(flover.img), mimetype="image/jpeg")
+
+@app.route("/flover")
+def flover():  # оброботчик
+    """get Flover"""
+    flovers = Flover.query.all()
+    res = {}
+    for flover in flovers:
+        res[flover.id] = {
+            "name" : flover.name,
+            "price" : flover.price,
+        }
+    return jsonify(res)
 
 
 @app.route("/profileImageUpdade", methods=["POST", "GET"])
