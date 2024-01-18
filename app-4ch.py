@@ -20,7 +20,7 @@ from forms import *
 from admin.admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-
+from sqlalchemy.exc import SQLAlchemyError
 
 domen = "http://127.0.0.1:5000"
 
@@ -47,7 +47,6 @@ nav = [
 #
 #
 # ==================================
-
 
 gifarr = [
     "SteinsGate",
@@ -85,6 +84,7 @@ class Users(db.Model):
     loggin = db.Column(db.String(100), unique=True, nullable=True)
     password = db.Column(db.String(255), nullable=True)
     ava = db.Column(db.LargeBinary)
+    header = db.Column(db.LargeBinary)
 
 
 class Treds(db.Model):
@@ -103,6 +103,7 @@ class Posts(db.Model):
     tred_name = db.Column(db.String(255), nullable=True)
     like = db.Column(db.Integer)
     dislike = db.Column(db.Integer)
+    autor = db.Column(db.String(255), nullable=True)
 
 
 class Comments(db.Model):
@@ -207,7 +208,6 @@ def img_socket(tred):
 
 # ======================== END SOCKET ======================================
 
-
 # @app.teardown_appcontext
 # def close_db(error):
 #     """соединение с бд"""
@@ -255,6 +255,7 @@ def login():  # оброботчик
         data = request.get_json()
         users = Users.query.all()
         for i in range(len(users)):
+            print(data["password"])
             if (data["login"] == users[i].loggin) and check_password_hash(
                 users[i].password, data["password"]
             ):
@@ -274,10 +275,22 @@ def logout():  # оброботчик
     return res
 
 
-@app.route("/api", methods=["POST", "GET"])
-def api():  # оброботчик
+@app.route("/getVideo", methods=["POST", "GET"])
+def getVideo():  # оброботчик
     """api"""
     arr = Posts.query.filter(Posts.tred_name == "video_api").all()
+    res = {}
+    for i in arr:
+        res[i.post_id] = {
+            "name": i.post,
+        }
+    return jsonify({"data": res})
+
+
+@app.route("/getVideo/<autor>", methods=["POST", "GET"])
+def getVideoAutor(autor):  # оброботчик
+    """api"""
+    arr = Posts.query.filter(Posts.tred_name == "video_api", Posts.autor == autor).all()
     res = {}
     for i in arr:
         res[i.post_id] = {
@@ -331,7 +344,7 @@ def apiGetComments(post_id):  # оброботчик
     return jsonify(res)
 
 
-@app.route("/api/<int:id>", methods=["POST", "GET"])
+@app.route("/getVideo/<int:id>", methods=["POST", "GET"])
 def apiGetID(id):  # оброботчик
     """api"""
     arr = Posts.query.filter(Posts.post_id == id).all()
@@ -340,6 +353,7 @@ def apiGetID(id):  # оброботчик
         "name": arr[0].post,
         "like": arr[0].like,
         "dislike": arr[0].dislike,
+        "autor": arr[0].autor,
     }
     return jsonify({"data": res})
 
@@ -384,6 +398,7 @@ def tread():  # оброботчик
                         img=img_binary,
                         type="jpeg",
                         tred_name="main",
+                        autor="root",
                     )
                     db.session.add(addData)
                     db.session.flush()
@@ -403,6 +418,7 @@ def tread():  # оброботчик
                         img=img_binary,
                         type="mp4",
                         tred_name="main",
+                        autor="root",
                     )
                     db.session.add(addData)
                     db.session.flush()
@@ -422,6 +438,7 @@ def tread():  # оброботчик
                         img=img_binary,
                         type="webm",
                         tred_name="main",
+                        autor="root",
                     )
                     db.session.add(addData)
                     db.session.flush()
@@ -434,7 +451,11 @@ def tread():  # оброботчик
         else:
             print("пост txt")
             try:
-                addData = Posts(post=request.form["text-tread"], tred_name="main")
+                addData = Posts(
+                    post=request.form["text-tread"],
+                    tred_name="main",
+                    autor="root",
+                )
                 db.session.add(addData)
                 db.session.flush()
                 db.session.commit()
@@ -510,6 +531,7 @@ def tred(tred_name):  # оброботчик
                         img=img_binary,
                         type="jpeg",
                         tred_name=tred_name,
+                        autor="root",
                     )
                     db.session.add(addData)
                     db.session.flush()
@@ -529,6 +551,7 @@ def tred(tred_name):  # оброботчик
                         img=img_binary,
                         type="mp4",
                         tred_name=tred_name,
+                        autor="root",
                     )
                     db.session.add(addData)
                     db.session.flush()
@@ -548,6 +571,7 @@ def tred(tred_name):  # оброботчик
                         img=img_binary,
                         type="webm",
                         tred_name=tred_name,
+                        autor="root",
                     )
                     db.session.add(addData)
                     db.session.flush()
@@ -560,7 +584,11 @@ def tred(tred_name):  # оброботчик
         else:
             print("пост txt")
             try:
-                addData = Posts(post=request.form["text-tread"], tred_name=tred_name)
+                addData = Posts(
+                    post=request.form["text-tread"],
+                    tred_name=tred_name,
+                    autor="root",
+                )
                 db.session.add(addData)
                 db.session.flush()
                 db.session.commit()
@@ -601,7 +629,10 @@ def tredcreate():  # оброботчик
 
             try:
                 addData = Posts(
-                    tred_true=f"/4ch/{tred_nameURL}", post=tred_name, tred_name="main"
+                    tred_true=f"/4ch/{tred_nameURL}",
+                    post=tred_name,
+                    tred_name="main",
+                    autor="root",
                 )
                 db.session.add(addData)
                 db.session.flush()
@@ -708,8 +739,57 @@ def register():  # оброботчик
 @app.route("/profileImage/<loggin>")
 def profileImage(loggin):  # оброботчик
     """аватарка пользователя"""
-    ava = Users.query.filter(Users.loggin == loggin).all()
-    return send_file(io.BytesIO(ava[0].ava), mimetype="image/jpeg")
+    user = Users.query.filter(Users.loggin == loggin).all()
+    return send_file(io.BytesIO(user[0].ava), mimetype="image/jpeg")
+
+
+@app.route("/profileHeader/<loggin>")
+def profileHeader(loggin):  # оброботчик
+    """шапка пользователя"""
+    user = Users.query.filter(Users.loggin == loggin).all()
+    if user[0].header == None:
+        return send_file("./static/img/userHeaderDef.jpg", mimetype="image/jpeg")
+    else:
+        return send_file(io.BytesIO(user[0].header), mimetype="image/jpeg")
+
+
+@app.route("/profileImageUpdade", methods=["POST", "GET"])
+def profileImageUpdade():
+    print("profileImageUpdade")
+    if request.method == "POST":
+        login = request.form.get("login")
+        password = request.form.get("password")
+        ava = request.files["ava"]
+        user = Users.query.filter(Users.loggin == login).first()
+        if user and check_password_hash(user.password, password):
+            try:
+                if ava.filename == "ava.jpg":
+                    user.ava = ava.read()
+                    print("ava")
+                elif ava.filename == "header.jpg":
+                    print("header")
+                    user.header = ava.read()
+                db.session.commit()
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                print(f"Ошибка при коммите в бд: {str(e)}")
+                return jsonify({"code": 500, "error_message": str(e)})
+            except Exception as e:
+                db.session.rollback()
+                print(f"Другая ошибка при коммите в бд: {str(e)}")
+                return jsonify({"code": 500, "error_message": str(e)})
+
+            return jsonify({"code": 200})
+        return jsonify({"code": 500})
+
+
+@app.route("/getUser/<login>")
+def getUser(login):
+    user = Users.query.filter(Users.loggin == login).first()
+    try:
+        return jsonify({"code": 200, "login": user.loggin})
+    except AttributeError:
+        return jsonify({"code": 500})
 
 
 # ==== тестовый контекст запроса ====
@@ -737,6 +817,5 @@ if __name__ == "__main__":
     app.run(debug=True)
 # =// запуск web-сервера //=
 
-
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=80)
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=80)
